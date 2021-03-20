@@ -1,5 +1,15 @@
 import { Request, Response } from "express";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { Agent } from '../database';
+import { AgentAttributes } from '../database/models/agents';
+import config from '../config/config';
+
+const createToken = (agent: AgentAttributes) => {
+  return jwt.sign({id: agent.id}, config.jwtSecret, {
+    expiresIn: 28800
+  });
+}
 
 export const signUp = async (req: Request, res: Response) => {
   
@@ -32,7 +42,32 @@ export const signUp = async (req: Request, res: Response) => {
 }
 
 export const signIn = async (req: Request, res: Response) => {
-  
+
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).json({msg: 'Please send your email and password'});
+  }
+
+  const agent = await Agent.findOne({where: { email: req.body.email } });
+
+  if (!agent) {
+    return res.status(400).json({ msg: 'Invalid user or password' });
+  }
+
+  const { password, ...agentResponse } = agent.get();
+
+  const isPasswordValid = await comparePassword(req.body.password, password);
+
+  if (!isPasswordValid) {
+    return res.status(400).json({ msg: 'Invalid user or password' });
+  }
+
+  const token = createToken(agent.get());
+
+  return res.status(200).json({
+    agent: agentResponse,
+    token
+  })
+
 }
 
 export const getAllAgents = async (req: Request, res: Response) => {
@@ -49,4 +84,8 @@ export const getAllAgents = async (req: Request, res: Response) => {
     console.log(err);
     res.status(500).json('Internal Server Error');
   }
+}
+
+const comparePassword = async (requestPassword: string, agentPassword: string) => {
+  return await bcrypt.compare(requestPassword, agentPassword);
 }
