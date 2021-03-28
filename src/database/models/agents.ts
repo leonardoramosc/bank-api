@@ -10,7 +10,7 @@ const states = [
   "Vargas", "Yaracuy", "Zulia"];
 
 export const roles = ['manager', 'advisor'] as const;
-export type Roles = typeof roles[number];
+export type Role = typeof roles[number];
 
 export interface AgentAttributes {
   id: number;
@@ -20,7 +20,7 @@ export interface AgentAttributes {
   password: string;
   phone: string;
   state: string;
-  role: Roles;
+  role: Role;
   address: string;
   createdAt: Date;
   updatedAt?: Date;
@@ -36,7 +36,7 @@ export class AgentModel extends Model<AgentAttributes> implements AgentAttribute
   public password!: string;
   public phone!: string;
   public state!: string;
-  public role!: Roles;
+  public role!: Role;
   public address!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;

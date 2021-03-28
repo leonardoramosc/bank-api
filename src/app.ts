@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 
+import { errorHandler } from './utils/errorHandler';
+
 import authRoutes from './routes/auth.routes';
 import agentRoutes from './routes/agent.routes';
 
@@ -21,5 +23,8 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api', authRoutes);
 app.use('/api/agents', agentRoutes);
+
+// global error handler
+app.use(errorHandler)
 
 export default app;

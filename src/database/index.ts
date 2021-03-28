@@ -19,7 +19,3 @@ export const DBConn = new Sequelize(DB_URL, {
 });
 
 export const Agent = models.AgentFactory(DBConn);
-
-
-
-
